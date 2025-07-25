@@ -39,8 +39,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# IDEs
-.vscode/
+# IDEs - VS Code settings werden jetzt verfolgt für bessere Explorer-Konfiguration
+# .vscode/ (entfernt, damit VS Code-Einstellungen geteilt werden)
 .idea/
 *.swp
 *.swo
@@ -58,3 +58,6 @@ Thumbs.db
 # Logs
 logs
 *.log
+
+# Symbolische Links für Explorer-Organisation
+.next-dependencies

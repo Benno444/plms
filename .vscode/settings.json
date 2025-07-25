@@ -1,0 +1,32 @@
+{
+  "explorer.sortOrder": "mixed",
+  "explorer.sortOrderLexicographicOptions": "default",
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "package.json": "package-lock.json,npm-shrinkwrap.json,yarn.lock,pnpm-lock.yaml",
+    ".gitignore": ".gitattributes,.gitmodules,.gitmessage,.mailmap,.git-blame*",
+    "README*": "AUTHORS,BACKERS*,CHANGELOG*,CITATION*,CODE_OF_CONDUCT*,CONTRIBUTING*,CONTRIBUTORS,COPYING*,CREDITS,GOVERNANCE.md,HISTORY.md,LICENSE*,MAINTAINERS,MAKEFILE,SECURITY.md,SPONSORS*",
+    "*.ts": "${capture}.js.map,${capture}.d.ts",
+    "*.tsx": "${capture}.ts,${capture}.*.tsx",
+    "*.js": "${capture}.js.map,${capture}.min.js,${capture}.d.ts"
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/node_modules": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true,
+    "**/.next": true
+  },
+  "explorer.compactFolders": false,
+  "workbench.tree.indent": 12,
+  "workbench.tree.renderIndentGuides": "always"
+}
