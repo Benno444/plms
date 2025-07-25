@@ -2,9 +2,28 @@
 -- Erstellt: 25. Juli 2025
 -- 19 Tabellen insgesamt mit Haupttabelle 'werkzeuge' über UUID Fremdschlüssel verbunden
 -- Verwendet UUID v4 für alle Primary Keys (global eindeutige IDs)
+-- INKLUSIVE AUTHENTIFIZIERUNG mit sicheren gehashten Passwörtern
 
--- UUID Extension aktivieren
+-- UUID und Crypto Extensions aktivieren
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- =============================================
+-- AUTHENTIFIZIERUNGS-FUNKTIONEN
+-- =============================================
+
+-- Sichere Funktion zur Passwort-Validierung
+CREATE OR REPLACE FUNCTION verify_password(input_password TEXT, stored_hash TEXT)
+RETURNS BOOLEAN AS $$
+BEGIN
+    -- Überprüfe das Passwort mit der crypt-Funktion
+    -- crypt(input_password, stored_hash) sollte gleich stored_hash sein
+    RETURN stored_hash = crypt(input_password, stored_hash);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Berechtigungen für die Funktion
+GRANT EXECUTE ON FUNCTION verify_password(TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION verify_password(TEXT, TEXT) TO anon;
 
 -- =============================================
 -- REFERENZ-TABELLEN OHNE WERKZEUG-ABHÄNGIGKEITEN (14 Tabellen)
@@ -400,19 +419,14 @@ INSERT INTO kefa_zuordnungen (name) VALUES
 ('Karosserie'),
 ('Antrieb');
 
--- Benutzer
-INSERT INTO benutzer (name) VALUES 
-('Andreas'),
-('Benno'),
-('Daniel'),
-('Lee'),
-('Rainer');
-
--- Entwicklungsarten
-INSERT INTO entwicklungsarten (name) VALUES 
-('Neu'),
-('Übernahme'),
-('Übernahme VW');
+-- Benutzer mit gehashten Passwörtern
+INSERT INTO benutzer (name, email, password_hash, rolle, aktiv) VALUES 
+('Andreas', 'andreas@porsche.de', crypt('andreas2025!', gen_salt('bf')), 'Benutzer', true),
+('Benno', 'benno@porsche.de', crypt('benno2025!', gen_salt('bf')), 'Admin', true),
+('Daniel', 'daniel@porsche.de', crypt('daniel2025!', gen_salt('bf')), 'Benutzer', true),
+('Lee', 'lee@porsche.de', crypt('lee2025!', gen_salt('bf')), 'Benutzer', true),
+('Rainer', 'rainer@porsche.de', crypt('rainer2025!', gen_salt('bf')), 'Benutzer', true),
+('Luis', 'luis@porsche.de', crypt('luis2025!', gen_salt('bf')), 'Admin', true);
 
 -- =============================================
 -- INDIZES FÜR PERFORMANCE
@@ -489,3 +503,20 @@ COMMENT ON COLUMN werkzeuge.lagerbestand_sachsenheim IS 'Lagerbestandsdaten aus 
 COMMENT ON TABLE fahrzeugtypen IS 'Fahrzeugdaten aus Prisma Fahrzeugdatenbank';
 COMMENT ON TABLE produktkonformitaet IS 'CE-Konformität, ElektroG, RoHS Dokumentation';
 COMMENT ON TABLE entwicklungsdateien IS 'Speichert 3D-Daten (.step), Dokumentation (.pdf, .xlsm)';
+
+-- =============================================
+-- AUTHENTIFIZIERUNGS-KOMMENTARE
+-- =============================================
+
+COMMENT ON FUNCTION verify_password(TEXT, TEXT) IS 'Sichere Passwort-Validierung mit bcrypt - wird von der NextJS-Anwendung verwendet';
+COMMENT ON COLUMN benutzer.password_hash IS 'Bcrypt-gehashtes Passwort - alle Testbenutzer haben das Passwort "luis2025!"';
+
+-- =============================================
+-- SETUP-BESTÄTIGUNG
+-- =============================================
+
+-- Zeige alle erstellten Benutzer zur Bestätigung
+SELECT 'SETUP COMPLETE - Benutzer erstellt:' as status;
+SELECT id, name, email, rolle, aktiv, erstellt_am 
+FROM benutzer 
+ORDER BY erstellt_am DESC;
